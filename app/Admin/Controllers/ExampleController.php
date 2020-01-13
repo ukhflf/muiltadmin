@@ -18,13 +18,6 @@ class ExampleController extends AdminController
      */
     protected $title = 'Example controller';
 
-    public function index(Content $content)
-    {
-        $data = Scan::find(1);
-        dd($data);
-    }
-
-
     /**
      * Make a grid builder.
      *
@@ -32,7 +25,7 @@ class ExampleController extends AdminController
      */
     protected function grid()
     {
-        $grid = new Grid(new ExampleModel);
+        $grid = new Grid(new Scan);
 
         $grid->column('id', __('ID'))->sortable();
         $grid->column('created_at', __('Created at'));
@@ -49,7 +42,7 @@ class ExampleController extends AdminController
      */
     protected function detail($id)
     {
-        $show = new Show(ExampleModel::findOrFail($id));
+        $show = new Show(Scan::findOrFail($id));
 
         $show->field('id', __('ID'));
         $show->field('created_at', __('Created at'));
@@ -65,12 +58,11 @@ class ExampleController extends AdminController
      */
     protected function form()
     {
-        $form = new Form(new ExampleModel);
-
+        $form = new Form(new Scan);
         $form->display('id', __('ID'));
+        $form->wxmenu('text')->default('{ "button": [ { "name": "我的", "sub_button": [ { "type": "click", "name": "这是一个子菜单", "key": "test" } ] }, { "name": "菜单名称", "sub_button": [ { "type": "miniprogram", "name": "跳转小程序", "appid": "11111", "url": "http://www.baidu.com", "pagepath": "/" } ] } ] }');
         $form->display('created_at', __('Created At'));
         $form->display('updated_at', __('Updated At'));
-
         return $form;
     }
 }

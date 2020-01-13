@@ -24,6 +24,8 @@ class CreatScansTalbe extends Migration
 
             $table->string('ticket')->comment('二维码票');
 
+            $table->json('menus')->comment('菜单');
+
             $table->timestamps();
 
             $table->softDeletes();
