@@ -23,7 +23,8 @@ class CreateRepliesTable extends Migration
             ])->comment('回复类型 subscribe 关注回复 default 默认回复 keywords 关键词回复');
             $table->string('name', 30)->nullable()->comment('规则名称'); //标题
             $table->string('content')->nullable()->comment('触发内容 events');
-            $table->string('group_ids')->nullable()->comment('适用范围：组id数组');
+            $table->tinyInteger('reply_type')->nullable()->comment('回复分类 0 文本 1 图文');
+            $table->tinyInteger('material_id')->nullable()->comment('素材');
             $table->timestamps();
             $table->softDeletes();
 

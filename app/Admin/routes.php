@@ -15,4 +15,5 @@ Route::group([
     $router->resource('set-account', 'SetAccountController');  //设置微信帐户
     $router->resource('set-menu', 'SetMenuController');  //设置菜单
     $router->resource('replies', 'ReplyController');  //关键词回复
+    $router->resource('repliespic', 'ReplyPicController');  //关键词回复
 });

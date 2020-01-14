@@ -11,14 +11,14 @@ use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 
-class ReplyController extends AdminController
+class ReplyPicController extends AdminController
 {
     /**
      * Title for current resource.
      *
      * @var string
      */
-    protected $title = '关键词回复';
+    protected $title = '图文消息回复';
 
     /**
      * Make a grid builder.
@@ -28,7 +28,7 @@ class ReplyController extends AdminController
     protected function grid()
     {
         $grid = new Grid(new Reply());
-        $grid->model()->where('reply_type',0)->orderBy('id','desc');
+        $grid->model()->where('reply_type',1)->orderBy('id','desc');
         $grid->column('id', __('ID'))->sortable();
 //        $grid->column('name','规则名称');
         $grid->column('trigger_keywords','回复关键字')->display(function ($value){
@@ -50,16 +50,14 @@ class ReplyController extends AdminController
                     return "<span class='badge bg-yellow'>默认回复</span>";
                     break;
                 case 'keywords':
-                    return "<span class='badge bg-red'>关键词回复</span>";
+                    return "<span class='badge bg-red'>关键字回复</span>";
                     break;
                 default:
-                    return "<span class='badge bg-red'>关键词回复</span>";
+                    return "<span class='badge bg-red'>关键字回复</span>";
                     break;
             }
         });
-        $grid->column('material.content','回复内容')->display(function($value){
-                return urldecode($value);
-        });
+        $grid->column('material.title','回复内容');
         return $grid;
     }
 
@@ -73,19 +71,9 @@ class ReplyController extends AdminController
         $form = new Form(new Reply());
         $form->text('name','规则名称')->rules('required');
         $form->tags('trigger_keywords','回复关键词')->rules('required');
-        $form->radio('trigger_type','回复类型')->options(['subscribe'=>'关注回复','default'=>'默认回复','keywords'=>'关键词回复'])->rules('required');
+        $form->radio('trigger_type','回复类型')->options(['subscribe'=>'关注回复','default'=>'默认回复','keywords'=>'图文消息回复'])->rules('required');
 //        $form->textarea('content','回复内容')->rules('required');
-        $form->select('material_id','回复素材')->options(
-            function(){
-                $data = Material::where('type','text')->get();
-                if(!empty($data)){
-                    foreach ($data as $k=>$v){
-                        $v->content = urldecode($v->content);
-                    }
-                }
-                return $data->pluck('content','id');
-            }
-        )->rules('required');
+        $form->select('material_id','回复素材')->options(Material::where('type','article')->pluck('title','id'))->rules('required');
         return $form;
     }
 }
