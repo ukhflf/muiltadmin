@@ -6,6 +6,8 @@ use App\Events\ProducerCreate;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
+use EasyWeChat\Factory;
+use App\admin\Models\Account;
 
 class WechatMessageListener implements ShouldQueue
 {
@@ -30,7 +32,9 @@ class WechatMessageListener implements ShouldQueue
         //进行客服消息回复
         $message = '';//字符
         $message = urldecode($event->reply->material->content);
-        $app = app('wechat.official_account');
+//        $app = app('wechat.official_account');
+        $config = Account::getAccountConfigByUid();
+        $app = Factory::officialAccount($config);
         $app->customer_service->message($message)->to($event->openid)->send();
         Log::error('我执行了！');
         Log::error($event->reply->material->content);

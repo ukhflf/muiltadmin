@@ -8,6 +8,7 @@ use App\admin\Models\Menu;
 use App\admin\Models\Reply;
 use App\Events\ProducerCreate;
 use Encore\Admin\Facades\Admin;
+use EasyWeChat\Factory;
 
 class WechatController extends Controller
 {
@@ -17,40 +18,54 @@ class WechatController extends Controller
      * @author zdk 317583717@qq.com
      * @return mixed
      */
-    public function serve(){
-      $app = app('wechat.official_account');//@todo 处理根据帐户取得配置信息，再处理成扫码获取用户的信息
+    public function serve($token){
+//      $app = app('wechat.official_account');//@todo 处理根据帐户取得配置信息，再处理成扫码获取用户的信息
+//      $config = config('wechat.official_account.default');
+
+      $config = Account::getAccountConfigByToken();
+      $app = Factory::officialAccount($config);
       $app->server->push(function ($message) {
           switch ($message['MsgType']) {
               case 'event':
-                  return '收到事件消息';
+//                  return '收到事件消息';
+                  return '';
                   break;
               case 'text':
                   $content = $message['content'];
                   $openid = $message['FromUserName'];
                     //处理文字回复
                     //其它事件处理成空返回
-                  return '收到文字消息';
+//                  return '收到文字消息';
+                  $result = Reply::sendCustomerServiceMessageToUser($content,$openid);
+                  return '';
                   break;
               case 'image':
-                  return '收到图片消息';
+//                  return '收到图片消息';
+                  return '';
                   break;
               case 'voice':
-                  return '收到语音消息';
+//                  return '收到语音消息';
+                  return '';
                   break;
               case 'video':
-                  return '收到视频消息';
+//                  return '收到视频消息';
+                  return '';
                   break;
               case 'location':
-                  return '收到坐标消息';
+//                  return '收到坐标消息';
+                  return '';
                   break;
               case 'link':
-                  return '收到链接消息';
+//                  return '收到链接消息';
+                  return '';
                   break;
               case 'file':
-                  return '收到文件消息';
+//                  return '收到文件消息';
+                  return '';
               // ... 其它消息
               default:
-                  return '收到其它消息';
+//                  return '收到其它消息';
+                  return '';
                   break;
           }
       });
@@ -91,10 +106,11 @@ class WechatController extends Controller
     public function testSend(){
         $content = '红包';
         $openid = 'oeEzZwMIYHK1dU4BYQFvQw71jVlE';
-        $reply = Reply::whereRaw("FIND_IN_SET('".$content."',trigger_keywords)")->orderBy('id','desc')->first();
-        $event = new ProducerCreate($reply,$openid); //事件
-        event(ProducerCreate::class,$event); //手动触发事件,并且监听器是一个队列处理，在监听器中有handle,直接在handle中进行业务逻辑的处理
-        return 2;
+//        $reply = Reply::whereRaw("FIND_IN_SET('".$content."',trigger_keywords)")->orderBy('id','desc')->first();
+//        $event = new ProducerCreate($reply,$openid); //事件
+//        event(ProducerCreate::class,$event); //手动触发事件,并且监听器是一个队列处理，在监听器中有handle,直接在handle中进行业务逻辑的处理
+        $result = Reply::sendCustomerServiceMessageToUser($content,$openid);
+        dd($result);
     }
 
 

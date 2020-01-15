@@ -14,7 +14,7 @@ Route::get('/', function (){
     return redirect('/admin');
 });
 
-Route::any('wechat', 'WechatController@serve');
+Route::any('wechat/{toekn}', 'WechatController@serve');
 Route::any('wechat/menu', 'WechatController@getMenu');
 Route::any('wechat/create-menu', 'WechatController@createMenu');
 Route::any('testsend', 'WechatController@testSend');
