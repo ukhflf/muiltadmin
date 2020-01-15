@@ -31,12 +31,12 @@ class WechatMessageListener implements ShouldQueue
     {
         //进行客服消息回复
         $message = '';//字符
-        $message = urldecode($event->reply->material->content);
+        $message = htmlspecialchars_decode(urldecode($event->reply['content']));
 //        $app = app('wechat.official_account');
-        $config = Account::getAccountConfigByUid();
+        $config = Account::getAccountConfigByToken($event->token);
         $app = Factory::officialAccount($config);
         $app->customer_service->message($message)->to($event->openid)->send();
         Log::error('我执行了！');
-        Log::error($event->reply->material->content);
+        Log::error($event->reply['content']);
     }
 }

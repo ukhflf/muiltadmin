@@ -3,10 +3,12 @@
 namespace App\Admin\Controllers;
 
 use App\admin\Models\Account;
+use App\admin\Models\Administrator;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Layout\Content;
+
 
 class SetAccountController extends AdminController
 {
@@ -61,4 +63,5 @@ class SetAccountController extends AdminController
         $form->textarea('remark','备注')->default('');
         return $form;
     }
+
 }

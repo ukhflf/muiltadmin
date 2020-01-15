@@ -10,5 +10,6 @@ class TenantDatabaseSeeder extends Seeder
     public function run()
     {
          $this->call(RepliesTableSeeder::class);
+         $this->call(AdminUsersTableSeeder::class);
     }
 }

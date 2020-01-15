@@ -9,7 +9,6 @@ use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
-use App\admin\Models\Reply;
 use Hyn\Tenancy\Queue\TenantAwareJob;
 
 class ProducerCreate
@@ -18,16 +17,18 @@ class ProducerCreate
     public $reply;
     public $openid;
     public $app;
+    public $token;
 
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct(Reply $reply,$openid)
+    public function __construct($reply,$openid,$token)
     {
         $this->reply = $reply;
         $this->openid = $openid;
+        $this->token = $token;
     }
 
     /**

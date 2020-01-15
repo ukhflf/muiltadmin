@@ -3,15 +3,25 @@
 namespace App\Http\Controllers;
 
 use App\admin\Models\Account;
-use App\admin\Models\AdminUser;
 use App\admin\Models\Menu;
 use App\admin\Models\Reply;
 use App\Events\ProducerCreate;
 use Encore\Admin\Facades\Admin;
 use EasyWeChat\Factory;
+use Hyn\Tenancy\Environment;
+use Hyn\Tenancy\Models\Hostname;
+use Hyn\Tenancy\Repositories\HostnameRepository;
+use Hyn\Tenancy\Repositories\WebsiteRepository;
+use Hyn\Tenancy\Models\Website;
+use App\admin\Models\Administrator;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redis;
+
 
 class WechatController extends Controller
 {
+
     /**
      * 微信公众号设置消息发送回调接口
      * @descritpion ''
@@ -24,7 +34,7 @@ class WechatController extends Controller
 
       $config = Account::getAccountConfigByToken();
       $app = Factory::officialAccount($config);
-      $app->server->push(function ($message) {
+      $app->server->push(function ($message) use ($token) {
           switch ($message['MsgType']) {
               case 'event':
 //                  return '收到事件消息';
@@ -36,7 +46,7 @@ class WechatController extends Controller
                     //处理文字回复
                     //其它事件处理成空返回
 //                  return '收到文字消息';
-                  $result = Reply::sendCustomerServiceMessageToUser($content,$openid);
+                  $result = Reply::sendCustomerServiceMessageToUser($content,$openid,$token);
                   return '';
                   break;
               case 'image':
@@ -103,16 +113,37 @@ class WechatController extends Controller
     /**
      * 测试消息回复队列
      */
-    public function testSend(){
-        $content = '红包';
+    public function testSend($token){
+//        Redis::set('wechat.reply.1111','2222');
+//        dd(Redis::get('wechat.reply.1111'));
+        $content = '礼豫';
         $openid = 'oeEzZwMIYHK1dU4BYQFvQw71jVlE';
 //        $reply = Reply::whereRaw("FIND_IN_SET('".$content."',trigger_keywords)")->orderBy('id','desc')->first();
 //        $event = new ProducerCreate($reply,$openid); //事件
 //        event(ProducerCreate::class,$event); //手动触发事件,并且监听器是一个队列处理，在监听器中有handle,直接在handle中进行业务逻辑的处理
-        $result = Reply::sendCustomerServiceMessageToUser($content,$openid);
+        $result = Reply::sendCustomerServiceMessageToUser($content,$openid,$token);
         dd($result);
     }
 
 
+    /**
+     * 初始化帐户信息
+     * @param $site
+     */
+    public function initAccount(){
+
+        $site = request()->get('site');
+        $website = new Website;
+        app(WebsiteRepository::class)->create($website);
+
+        $hostname = new Hostname();
+        $hostname->fqdn = $site;
+        $hostname = app(HostnameRepository::class)->create($hostname);
+        app(HostnameRepository::class)->attach($hostname, $website);
+
+        $tenancy = app(Environment::class);
+        $tenancy->tenant($website);
+        exit('完成！');
+    }
 
 }

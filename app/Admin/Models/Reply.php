@@ -6,8 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 use Hyn\Tenancy\Traits\UsesTenantConnection;
 use App\admin\Models\Account;
 use Encore\Admin\Facades\Admin;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use App\Events\ProducerCreate;
+use Illuminate\Support\Facades\Redis;
 
 class Reply extends Model
 {
@@ -38,10 +40,16 @@ class Reply extends Model
      * @param $openid 回复用户openid
      * @return bool
      */
-    public static  function sendCustomerServiceMessageToUser($content,$openid){
+    public static  function sendCustomerServiceMessageToUser($content,$openid,$token){
         try{
-            $reply = Reply::whereRaw("FIND_IN_SET('".$content."',trigger_keywords)")->orderBy('id','desc')->first();
-            $event = new ProducerCreate($reply,$openid); //事件
+            $reply = [];
+            $tempReply = Redis::get('wechat.reply.'.$content);
+            if(empty($tempReply)){
+                $reply = Reply::whereRaw("FIND_IN_SET('".$content."',trigger_keywords)")->orderBy('id','desc')->first();
+                Redis::set('wechat.reply.'.$content,$reply->material->content);
+            }
+            $reply['content'] = $tempReply;
+            $event = new ProducerCreate($reply,$openid,$token); //事件
             event(ProducerCreate::class,$event); //手动触发事件,并且监听器是一个队列处理，在监听器中有handle,直接在handle中进行业务逻辑的处理
         }catch (\Exception $e){
             Log::error($e->getMessage());
